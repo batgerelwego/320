@@ -1,0 +1,774 @@
+
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I.ETC320 — Шалгалт</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#11467F; --blue:#2E6FB0; --orange:#D9661A; --dorange:#B8530F;
+  --ink:#1E2A36; --muted:#5C6F7E; --faint:#8CA0B2;
+  --card:#F2F7FC; --tinto:#FDF0E3; --line:#D7E3EF; --ok:#1C7C4A; --bad:#C0392B;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Manrope",system-ui,sans-serif;color:var(--ink);background:#fff;
+  padding:24px 16px 70px;line-height:1.5}
+.wrap{max-width:860px;margin:0 auto}
+.code{font-family:"Exo 2";font-weight:700;letter-spacing:.14em;font-size:11px;
+  color:var(--orange);text-transform:uppercase}
+h1{font-family:"Exo 2";font-weight:800;font-size:clamp(21px,3.4vw,28px);line-height:1.2;margin:7px 0 5px;color:var(--navy)}
+h2{font-family:"Exo 2";font-weight:700;font-size:17px;color:var(--navy);margin:0}
+.sub{color:var(--muted);font-size:13.5px}
+.card{border:1px solid var(--line);border-radius:14px;background:#fff;padding:20px;margin-bottom:14px}
+.card.tint{background:var(--card)}
+.card.warnbox{background:var(--tinto);border-color:#F0C9A0}
+
+/* ---- gate ---- */
+#gate{max-width:430px;margin:5vh auto}
+.tabs{display:flex;gap:7px;margin:16px 0}
+.tab{flex:1;font-family:"Exo 2";font-weight:700;font-size:13px;cursor:pointer;
+  background:var(--card);border:1px solid var(--line);color:var(--muted);
+  padding:10px;border-radius:10px;transition:.2s}
+.tab.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+label{display:block;font-size:11.5px;font-weight:600;color:var(--muted);
+  letter-spacing:.03em;margin:13px 0 5px;font-family:"Exo 2"}
+label:first-of-type{margin-top:0}
+input,select,textarea{width:100%;background:#fff;border:1px solid var(--line);
+  border-radius:9px;color:var(--ink);font-family:"Manrope";font-size:14.5px;
+  padding:11px 12px;outline:none;transition:.18s}
+textarea{font-family:ui-monospace,"Cascadia Code",Consolas,monospace;font-size:13.5px;resize:vertical;min-height:72px}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(46,111,176,.13)}
+.btn{cursor:pointer;border:none;border-radius:10px;padding:12px 20px;
+  font-family:"Exo 2";font-weight:700;font-size:14.5px;
+  background:var(--navy);color:#fff;transition:.18s}
+.btn:hover:not(:disabled){background:#0d3a6b}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.wide{width:100%;margin-top:16px}
+.btn.orange{background:var(--orange)}
+.btn.orange:hover:not(:disabled){background:var(--dorange)}
+.btn.ghost{background:var(--card);color:var(--navy);border:1px solid var(--line);font-size:12.5px;padding:8px 13px}
+.btn.ghost:hover:not(:disabled){background:#e4eef8}
+.msg{margin-top:11px;font-size:13px;min-height:17px;text-align:center;color:var(--bad);opacity:0;transition:.2s}
+.msg.show{opacity:1}
+.msg.good{color:var(--ok)}
+.hint{margin-top:13px;color:var(--faint);font-size:11.5px;line-height:1.5;
+  border-top:1px solid var(--line);padding-top:11px}
+
+/* ---- exam header ---- */
+.bar{position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid var(--line);
+  margin:-24px -16px 18px;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.who{display:flex;align-items:center;gap:9px;margin-right:auto;font-size:13.5px;font-weight:600}
+.av{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;
+  background:var(--navy);color:#fff;font-family:"Exo 2";font-weight:800;font-size:12px}
+.pill{font-family:"Exo 2";font-weight:700;font-size:11.5px;padding:6px 11px;border-radius:999px;
+  border:1px solid var(--line);background:var(--card);color:var(--muted);white-space:nowrap}
+.pill.warn{background:var(--tinto);border-color:#F0C9A0;color:var(--dorange)}
+.pill.danger{background:#FDECEA;border-color:#F3B9B3;color:var(--bad)}
+.progress{height:4px;background:var(--line);border-radius:3px;overflow:hidden;width:100%;margin-top:4px}
+.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--orange));width:0;transition:.3s}
+
+/* ---- questions ---- */
+.sechead{display:flex;align-items:baseline;gap:11px;margin:26px 0 12px;flex-wrap:wrap}
+.secnum{font-family:"Exo 2";font-weight:800;font-size:12px;color:#fff;background:var(--orange);
+  padding:4px 10px;border-radius:999px}
+.secpts{font-size:12px;color:var(--muted);margin-left:auto;font-family:"Exo 2";font-weight:600}
+.q{border:1px solid var(--line);border-radius:12px;padding:15px 17px;margin-bottom:11px}
+.q.answered{border-color:#BBD4EA;background:#FAFCFE}
+.qtop{display:flex;gap:10px;margin-bottom:11px}
+.qn{flex:none;width:25px;height:25px;border-radius:7px;display:grid;place-items:center;
+  background:var(--card);color:var(--navy);font-family:"Exo 2";font-weight:700;font-size:12.5px}
+.qt{font-size:14.5px;line-height:1.55}
+.qt code{background:#EEF3F8;padding:1px 5px;border-radius:4px;
+  font-family:ui-monospace,Consolas,monospace;font-size:13px}
+.opts{display:flex;flex-direction:column;gap:7px;margin-left:35px}
+.opts.tf{flex-direction:row;gap:9px}
+.opt{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:9px;
+  padding:9px 12px;cursor:pointer;font-size:14px;transition:.15s;background:#fff}
+.opt:hover{border-color:var(--blue);background:#F7FBFE}
+.opt input{width:auto;margin:0;accent-color:var(--blue)}
+.opt.sel{border-color:var(--blue);background:#EDF4FB;font-weight:600}
+.opts.tf .opt{flex:1;justify-content:center}
+.ansbox{margin-left:35px}
+.ansbox .tip{font-size:11.5px;color:var(--faint);margin-top:5px}
+
+/* ---- modal / lock ---- */
+.modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;
+  padding:22px;background:rgba(17,32,45,.55);backdrop-filter:blur(3px)}
+.modal.show{display:flex}
+.modal .inner{background:#fff;border-radius:16px;padding:26px;max-width:420px;width:100%;text-align:center}
+.modal h3{font-family:"Exo 2";font-weight:800;font-size:20px;margin-bottom:9px;color:var(--dorange)}
+.modal p{font-size:14px;color:var(--ink);margin-bottom:17px}
+.big{font-family:"Exo 2";font-weight:800;font-size:46px;color:var(--navy);line-height:1}
+
+/* ---- teacher ---- */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-family:"Exo 2";font-weight:600;font-size:10.5px;letter-spacing:.04em;
+  text-transform:uppercase;color:#fff;background:var(--navy);padding:9px 8px;white-space:nowrap}
+td{padding:8px;border-bottom:1px solid var(--line);white-space:nowrap}
+tbody tr:nth-child(even){background:#F8FBFD}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tag{display:inline-block;font-family:"Exo 2";font-weight:700;font-size:10.5px;
+  padding:3px 8px;border-radius:999px}
+.tag.lock{background:#FDECEA;color:var(--bad)}
+.tag.ok{background:#E8F5EE;color:var(--ok)}
+.tools{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+.stat{background:var(--card);border-radius:11px;padding:13px 15px}
+.stat .k{font-size:11px;color:var(--muted);font-family:"Exo 2";font-weight:600;text-transform:uppercase}
+.stat .v{font-family:"Exo 2";font-weight:800;font-size:24px;color:var(--navy);margin-top:2px}
+.demo{background:var(--tinto);border:1px solid #F0C9A0;color:var(--dorange);
+  border-radius:10px;padding:10px 14px;font-size:12.5px;font-weight:600;margin-bottom:14px}
+</style>
+</head>
+<body>
+
+<!-- ================= НЭВТРЭХ ================= -->
+<div class="wrap" id="gate">
+  <div class="card">
+    <div class="code">I.ETC320 · ШУТИС-ЭХИС</div>
+    <h1>Шалгалт</h1>
+    <div class="sub">Эрчим хүчний мэдээллийн систем ба хиймэл оюун ухаан · нийт 10 оноо</div>
+    <div id="demoBanner"></div>
+    <div class="tabs">
+      <button class="tab on" id="tabStu">Оюутан</button>
+      <button class="tab" id="tabTea">Багш</button>
+    </div>
+    <div id="formStu">
+      <label for="stuSel">Овог нэрээ сонгоно уу</label>
+      <select id="stuSel"><option value="">— ачааллаж байна… —</option></select>
+      <label for="stuPw">Нууц үг</label>
+      <input id="stuPw" type="password" inputmode="numeric" maxlength="8"
+             placeholder="Оюутны кодын сүүлийн 4 орон" autocomplete="off">
+      <button class="btn wide" id="stuGo">Шалгалт эхлүүлэх</button>
+    </div>
+    <div id="formTea" style="display:none">
+      <label for="teaId">Багшийн ID</label>
+      <input id="teaId" type="text" placeholder="M.EC21" autocomplete="off">
+      <label for="teaPw">Нууц үг</label>
+      <input id="teaPw" type="password" autocomplete="off">
+      <button class="btn wide" id="teaGo">Нэвтрэх</button>
+    </div>
+    <div class="msg" id="gtMsg"></div>
+    <div class="hint" id="gtHint">
+      Нууц үг нь таны <b>оюутны кодын сүүлийн 4 орон</b> байна.<br>
+      Шалгалт эхэлсний дараа <b>цонх солих бүрт анхааруулга</b> өгөх ба
+      <b>3 дахь удаад шалгалт түгжигдэнэ</b>.
+    </div>
+  </div>
+</div>
+
+<!-- ================= ШАЛГАЛТ ================= -->
+<div class="wrap" id="exam" style="display:none">
+  <div class="bar">
+    <span class="who"><span class="av" id="avatar">О</span><span id="whoName"></span></span>
+    <span class="pill" id="pillAns">0 / 28 хариулсан</span>
+    <span class="pill" id="pillSw">Цонх солилт: 0 / 3</span>
+    <div class="progress"><span id="progBar"></span></div>
+  </div>
+
+  <div class="card warnbox">
+    <b>Анхаар:</b> Энэ шалгалтын явцад өөр цонх, таб руу шилжих бүрт системд бүртгэгдэнэ.
+    <b>3 удаа</b> шилжвэл шалгалт автоматаар түгжигдэж, тэр үеийн хариултаар дүн гарна.
+  </div>
+
+  <div id="qzone"></div>
+
+  <div class="card tint" style="text-align:center">
+    <div style="font-size:14px;margin-bottom:12px" id="finalNote">
+      Бүх хариултаа шалгаад илгээнэ үү. <b>Илгээсний дараа засах боломжгүй.</b>
+    </div>
+    <button class="btn orange" id="submitBtn" style="min-width:220px">Шалгалт илгээх</button>
+    <div class="msg" id="exMsg"></div>
+  </div>
+</div>
+
+<!-- ================= ДУУССАН ================= -->
+<div class="wrap" id="done" style="display:none">
+  <div class="card" style="text-align:center;padding:34px 24px">
+    <div class="code">Шалгалт дууслаа</div>
+    <div class="big" id="finalScore" style="margin:14px 0 4px">—</div>
+    <div class="sub" style="margin-bottom:20px">нийт 10 онооноос</div>
+    <div class="stats" id="breakdown"></div>
+    <div class="sub" id="doneNote" style="margin-top:14px"></div>
+  </div>
+</div>
+
+<!-- ================= БАГШ ================= -->
+<div class="wrap" id="teacher" style="display:none">
+  <div class="bar">
+    <span class="who"><span class="av" style="background:var(--orange)">Б</span><span id="teaName"></span></span>
+    <button class="btn ghost" id="refreshBtn">↻ Шинэчлэх</button>
+    <button class="btn ghost" id="csvBtn">⬇ CSV татах</button>
+    <button class="btn ghost" id="outBtn">Гарах</button>
+  </div>
+  <div class="stats" id="teaStats"></div>
+  <div class="card">
+    <h2>Дүнгийн хүснэгт</h2>
+    <div class="sub" style="margin:4px 0 12px">Оюутны мөрийг түгжээтэй бол «Дахин» товчоор цуцалж, дахин өгөх эрх олгоно.</div>
+    <div class="scroll" id="resTable"></div>
+  </div>
+  <div class="card">
+    <h2>Сүүлийн үйл явдлууд</h2>
+    <div class="sub" style="margin:4px 0 12px">Нэвтрэлт, цонх солилт, түгжилт, илгээлт</div>
+    <div class="scroll" id="logTable"></div>
+  </div>
+</div>
+
+<!-- ================= Modal ================= -->
+<div class="modal" id="warnModal">
+  <div class="inner">
+    <h3 id="wTitle">⚠ Анхааруулга</h3>
+    <p id="wBody"></p>
+    <button class="btn" id="wOk" style="min-width:150px">Ойлголоо</button>
+  </div>
+</div>
+
+<div class="modal" id="lockModal">
+  <div class="inner">
+    <h3 style="color:var(--bad)">🔒 Шалгалт түгжигдлээ</h3>
+    <p>Та шалгалтын явцад <b>3 удаа</b> өөр цонх руу шилжсэн тул шалгалт автоматаар
+       хаагдаж, тэр үеийн хариултаар дүн бодогдлоо.<br><br>
+       Дахин өгөх шаардлагатай бол багштайгаа холбогдоно уу.</p>
+    <button class="btn" id="lockOk" style="min-width:150px">Хаах</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   ТОХИРГОО — Apps Script вэб аппын /exec хаягийг энд тавина
+   ============================================================ */
+const API_URL = "https://script.google.com/macros/s/AKfycbwa6WULX7F706KlmR_PJ9FlXyRrBtSgyMHDHibzqJ9MSqFPf4rlBRjlSEHp53eKLVDN/exec";   // жишээ: "https://script.google.com/macros/s/AKfy.../exec"
+
+const MAX_SWITCH = 3;
+const DEMO = !API_URL;
+
+const $ = s => document.querySelector(s);
+const esc = t => String(t == null ? "" : t)
+  .replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+let TOKEN = null, USER = null, CLIENT_IP = "";
+let switches = 0, lastSwitchAt = 0, examActive = false, startedAt = 0, submitted = false;
+
+/* ============================================================
+   АСУУЛТУУД
+   ============================================================ */
+const S1 = [
+  ["Цахилгаан эрчим хүч нь үйлдвэрлэл → дамжуулал → хуваарилалт → хэрэглээ гэсэн дарааллаар урсдаг.", true],
+  ["Шугам дахь алдагдлыг багасгахын тулд дамжуулах шугамын хүчдэлийг бууруулдаг.", false],
+  ["SCADA систем нь сүлжээг бодит цагт хянаж, алсаас удирдах боломж олгодог.", true],
+  ["IEC 61850 протокол нь өгөгдлийг 40001 гэх мэт регистрийн дугаараар хаягладаг.", false],
+  ["MQTT протокол нь publish/subscribe зарчмаар ажилладаг.", true],
+  ["SVM-ийн зааглах хилийг зөвхөн тулгуур векторууд тодорхойлдог.", true],
+  ["SVM-д захын өргөнийг ихэсгэх нь ‖w‖-ийн утгыг ихэсгэхтэй тэнцүү.", false],
+  ["Сигмоид функцийн гаралт үргэлж 0 ба 1-ийн хооронд байна.", true],
+  ["ReLU функцийн уламжлал сөрөг мужид 1-тэй тэнцүү байна.", false],
+  ["Зургийн өгөгдлийн санг хуваахдаа нэг зургийг сургалтын ба тестийн багцад зэрэг оруулж болно.", false]
+];
+
+const S2 = [
+  ["Эрчим хүчний мэдээллийн системийн хоёр дахь давхарга аль нь вэ?",
+   ["Хэмжилт", "Харилцаа холбоо", "Хадгалалт ба боловсруулалт", "Шинжилгээ ба хэрэглээ"], 1],
+  ["Дэд станцын дотор хамгаалалтын реле хооронд ойролцоогоор 4 мс-д дохио дамжуулдаг протокол:",
+   ["Modbus RTU", "MQTT", "IEC 61850 GOOSE", "HTTP"], 2],
+  ["Монголд дэд станц ↔ удирдлагын төв хооронд хамгийн түгээмэл хэрэглэгддэг протокол:",
+   ["IEC 60870-5-104", "Modbus ASCII", "LoRaWAN", "Zigbee"], 0],
+  ["SVM-ийн захын (margin) нийт өргөнийг ямар илэрхийлэл өгөх вэ?",
+   ["‖w‖", "½‖w‖²", "2 / ‖w‖", "wᵀx + b"], 2],
+  ["SVM-ийн дуал бодлогод өгөгдөл ямар хэлбэрээр ордог вэ?",
+   ["Детерминант хэлбэрээр", "Скаляр үржвэр xᵢᵀxⱼ хэлбэрээр", "Урвуу матриц хэлбэрээр", "Квадрат язгуур хэлбэрээр"], 1],
+  ["Цөмийн заль (kernel trick) юунд хэрэглэгддэг вэ?",
+   ["Өгөгдөл цэвэрлэхэд", "Санах ой хэмнэхэд",
+    "Шугаман бус өгөгдлийг өндөр хэмжээст орон зайд шугаман зааглагдахаар болгоход",
+    "Сургалтыг эрт зогсооход"], 2],
+  ["Сигмоид функцийн уламжлалын хамгийн их утга хэд вэ?",
+   ["1", "0.5", "0.25", "0"], 2],
+  ["Гүн сүлжээний далд давхаргад өнөөдөр хамгийн түгээмэл хэрэглэгддэг идэвхжүүлэх функц:",
+   ["Сигмоид", "ReLU", "Шугаман функц", "Алхамт функц"], 1],
+  ["Зургийн өгөгдлийн сангийн ангиуд тэнцвэргүй (нэг анги нь хэт цөөн) үед юуг хийх нь зохистой вэ?",
+   ["Тестийн багцыг томруулах", "Цөөн ангийн зургийг augmentation / oversampling-аар нэмэгдүүлэх",
+    "Бүх зургийг устгаж дахин эхлэх", "Сургалтыг зогсоох"], 1],
+  ["Ангиуд тэнцвэргүй үед загварын чанарыг үнэлэхэд аль хэмжүүр хамгийн тохиромжтой вэ?",
+   ["Зөвхөн accuracy", "Precision, recall, F1", "Зөвхөн сургалтын алдаа", "Сургалтын хугацаа"], 1]
+];
+
+const S3 = [
+  { t:"fill", q:"SVM-ийн захын нийт өргөн = <b>______</b> / ‖w‖ — хоосон зайд тоо бичнэ үү.",
+    num:2, ph:"тоо" },
+  { t:"fill", q:"Дуал бодлогод α<sub>i</sub> &gt; 0 байх өгөгдлийн цэгүүдийг юу гэж нэрлэдэг вэ?",
+    accept:["тулгуур вектор","тулгуур векторууд","тулгуурт вектор","тулгуурт векторууд","support vector","support vectors"],
+    ph:"нэр томьёо" },
+  { t:"calc", q:"Сигмоид функцийн утгыг бодно уу: σ(0) = ?", num:0.5, ph:"тоон хариу" },
+  { t:"calc", q:"σ(x) = 0.8 бол уламжлал σ′(x) хэд вэ? (σ′ = σ·(1−σ))", num:0.16, ph:"тоон хариу" },
+  { t:"calc", q:"ReLU(−3) + ReLU(5) = ?", num:5, ph:"тоон хариу" },
+  { t:"calc", q:"1200 зурагтай өгөгдлийн санг 70% / 15% / 15% харьцаагаар хуваавал <b>тестийн</b> багцад хэдэн зураг байх вэ?",
+    num:180, ph:"зургийн тоо" },
+  { t:"code", q:"scikit-learn ашиглан <b>RBF цөмтэй</b> SVM загвар үүсгээд <code>X_train, y_train</code> дээр сургах Python кодыг бичнэ үү.",
+    pats:[/SVC/i, /rbf/i, /\.fit\s*\(/], ph:"model = ...\nmodel.fit(...)" },
+  { t:"code", q:"NumPy массив <code>img</code> (утга 0–255) -ийг <b>float32</b> төрөлд шилжүүлж, <b>0–1</b> хооронд нормчлох Python мөрийг бичнэ үү.",
+    pats:[/astype/i, /float32/i, /255/], ph:"img = ..." }
+];
+
+const PTS = { s1: 0.2, s2: 0.3, s3: 0.625 };   // 10×0.2 + 10×0.3 + 8×0.625 = 10
+const TOTAL_Q = S1.length + S2.length + S3.length;
+
+/* ============================================================
+   Сервертэй харилцах
+   ============================================================ */
+async function api(payload) {
+  if (DEMO) throw new Error("Туршилтын горим — сервер холбоогүй.");
+  const r = await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload)
+  });
+  if (!r.ok) throw new Error("Сервер алдаа: " + r.status);
+  return await r.json();
+}
+
+async function getIP() {
+  try {
+    const c = new AbortController();
+    setTimeout(() => c.abort(), 3500);
+    const r = await fetch("https://api.ipify.org?format=json", { signal: c.signal });
+    const j = await r.json();
+    CLIENT_IP = j.ip || "";
+  } catch (e) { CLIENT_IP = ""; }
+}
+
+/* ============================================================
+   НЭВТРЭХ
+   ============================================================ */
+function gmsg(t, good) {
+  const m = $("#gtMsg");
+  m.textContent = t;
+  m.className = "msg show" + (good ? " good" : "");
+  clearTimeout(gmsg._t);
+  gmsg._t = setTimeout(() => m.className = "msg", 5000);
+}
+
+async function loadRoster() {
+  const sel = $("#stuSel");
+  if (DEMO) {
+    sel.innerHTML = '<option value="0">Туршилтын оюутан</option>';
+    return;
+  }
+  sel.innerHTML = '<option value="">— ачааллаж байна… —</option>';
+  try {
+    const res = await api({ action: "roster" });
+    if (!res.ok) throw new Error(res.error || "алдаа");
+    if (!res.students || !res.students.length) {
+      sel.innerHTML = '<option value="">— жагсаалт хоосон —</option>';
+      gmsg("Серверт оюутны жагсаалт хоосон байна (seedStudents ажиллуулна уу).");
+      return;
+    }
+    sel.innerHTML = '<option value="">— сонгоно уу —</option>' +
+      res.students.map(s => `<option value="${s.i}">${esc(s.name)}</option>`).join("");
+  } catch (e) {
+    sel.innerHTML = '<option value="">— холбогдсонгүй —</option>';
+    gmsg("Серверт холбогдож чадсангүй. " + e.message);
+  }
+}
+
+$("#tabStu").onclick = () => {
+  $("#tabStu").classList.add("on"); $("#tabTea").classList.remove("on");
+  $("#formStu").style.display = ""; $("#formTea").style.display = "none";
+  $("#gtHint").innerHTML = "Нууц үг нь таны <b>оюутны кодын сүүлийн 4 орон</b> байна.<br>" +
+    "Шалгалт эхэлсний дараа <b>цонх солих бүрт анхааруулга</b> өгөх ба <b>3 дахь удаад шалгалт түгжигдэнэ</b>.";
+};
+$("#tabTea").onclick = () => {
+  $("#tabTea").classList.add("on"); $("#tabStu").classList.remove("on");
+  $("#formTea").style.display = ""; $("#formStu").style.display = "none";
+  $("#gtHint").innerHTML = "Багшийн ID болон нууц үгээ оруулна уу.";
+};
+
+$("#stuGo").onclick = async function () {
+  const i = $("#stuSel").value, pw = $("#stuPw").value.trim();
+  if (i === "") { gmsg("Нэрээ сонгоно уу."); return; }
+  if (!pw)      { gmsg("Нууц үгээ оруулна уу."); return; }
+
+  this.disabled = true; this.textContent = "Шалгаж байна…";
+  await getIP();
+  try {
+    if (DEMO) {
+      USER = { name: "Туршилтын оюутан", sid: "DEMO" };
+      startExam();
+    } else {
+      const res = await api({ action: "login", role: "student", i: +i, pw, ip: CLIENT_IP });
+      if (!res.ok) { gmsg(res.error || "Нэвтэрч чадсангүй."); return; }
+      if (res.submitted) { gmsg("Та энэ шалгалтыг аль хэдийн өгсөн байна."); return; }
+      if (res.locked)    { gmsg("Таны шалгалт түгжигдсэн байна. Багштайгаа холбогдоно уу."); return; }
+      TOKEN = res.token; USER = { name: res.name, sid: res.sid };
+      switches = res.switches || 0;
+      startExam();
+    }
+  } catch (e) {
+    gmsg("Серверт холбогдож чадсангүй. " + e.message);
+  } finally {
+    this.disabled = false; this.textContent = "Шалгалт эхлүүлэх";
+  }
+};
+
+$("#teaGo").onclick = async function () {
+  const id = $("#teaId").value.trim(), pw = $("#teaPw").value;
+  if (!id || !pw) { gmsg("ID болон нууц үгээ оруулна уу."); return; }
+  if (DEMO) { gmsg("Багшийн самбар ажиллахад сервер холболт шаардлагатай."); return; }
+  this.disabled = true; this.textContent = "Шалгаж байна…";
+  try {
+    const res = await api({ action: "login", role: "teacher", id, pw });
+    if (!res.ok) { gmsg(res.error || "Нэвтэрч чадсангүй."); return; }
+    TOKEN = res.token; USER = { name: res.name };
+    $("#gate").style.display = "none";
+    $("#teacher").style.display = "";
+    $("#teaName").textContent = res.name + " · Багш";
+    loadResults();
+  } catch (e) {
+    gmsg("Серверт холбогдож чадсангүй. " + e.message);
+  } finally {
+    this.disabled = false; this.textContent = "Нэвтрэх";
+  }
+};
+
+["stuPw"].forEach(id => $("#" + id).addEventListener("keydown",
+  e => { if (e.key === "Enter") $("#stuGo").click(); }));
+["teaId", "teaPw"].forEach(id => $("#" + id).addEventListener("keydown",
+  e => { if (e.key === "Enter") $("#teaGo").click(); }));
+
+/* ============================================================
+   ШАЛГАЛТ БҮТЭЭХ
+   ============================================================ */
+function buildExam() {
+  let h = "";
+
+  h += `<div class="sechead"><span class="secnum">ХЭСЭГ 1</span>
+        <h2>Үнэн / Худал</h2><span class="secpts">10 асуулт · 2 оноо</span></div>`;
+  S1.forEach((it, i) => {
+    h += `<div class="q" id="q-a${i}">
+      <div class="qtop"><span class="qn">${i + 1}</span><span class="qt">${it[0]}</span></div>
+      <div class="opts tf">
+        <label class="opt"><input type="radio" name="a${i}" value="T"> Үнэн</label>
+        <label class="opt"><input type="radio" name="a${i}" value="F"> Худал</label>
+      </div></div>`;
+  });
+
+  h += `<div class="sechead"><span class="secnum">ХЭСЭГ 2</span>
+        <h2>Сонгох асуулт</h2><span class="secpts">10 асуулт · 3 оноо</span></div>`;
+  S2.forEach((it, i) => {
+    h += `<div class="q" id="q-b${i}">
+      <div class="qtop"><span class="qn">${i + 1}</span><span class="qt">${it[0]}</span></div>
+      <div class="opts">` +
+      it[1].map((o, k) =>
+        `<label class="opt"><input type="radio" name="b${i}" value="${k}">
+         <span><b>${"АБВГ"[k]}.</b> ${o}</span></label>`).join("") +
+      `</div></div>`;
+  });
+
+  h += `<div class="sechead"><span class="secnum">ХЭСЭГ 3</span>
+        <h2>Нөхөж бичих, бодолт ба код</h2><span class="secpts">8 асуулт · 5 оноо</span></div>`;
+  S3.forEach((it, i) => {
+    const isCode = it.t === "code";
+    h += `<div class="q" id="q-c${i}">
+      <div class="qtop"><span class="qn">${i + 1}</span><span class="qt">${it.q}</span></div>
+      <div class="ansbox">` +
+      (isCode
+        ? `<textarea name="c${i}" rows="3" spellcheck="false" placeholder="${esc(it.ph || "")}"></textarea>
+           <div class="tip">Кодын гол хэсгүүд бүрэн байвал бүтэн оноо авна.</div>`
+        : `<input type="text" name="c${i}" autocomplete="off" placeholder="${esc(it.ph || "")}">`) +
+      `</div></div>`;
+  });
+
+  $("#qzone").innerHTML = h;
+
+  $("#qzone").querySelectorAll('input[type=radio]').forEach(r => {
+    r.addEventListener("change", () => {
+      const box = r.closest(".opts");
+      box.querySelectorAll(".opt").forEach(o => o.classList.remove("sel"));
+      r.closest(".opt").classList.add("sel");
+      r.closest(".q").classList.add("answered");
+      updateProgress();
+    });
+  });
+  $("#qzone").querySelectorAll('input[type=text], textarea').forEach(el => {
+    el.addEventListener("input", () => {
+      el.closest(".q").classList.toggle("answered", el.value.trim().length > 0);
+      updateProgress();
+    });
+  });
+}
+
+function countAnswered() {
+  let n = 0;
+  S1.forEach((_, i) => { if (document.querySelector(`input[name=a${i}]:checked`)) n++; });
+  S2.forEach((_, i) => { if (document.querySelector(`input[name=b${i}]:checked`)) n++; });
+  S3.forEach((_, i) => {
+    const el = document.querySelector(`[name=c${i}]`);
+    if (el && el.value.trim()) n++;
+  });
+  return n;
+}
+
+function updateProgress() {
+  const n = countAnswered();
+  $("#pillAns").textContent = `${n} / ${TOTAL_Q} хариулсан`;
+  $("#progBar").style.width = (n / TOTAL_Q * 100) + "%";
+}
+
+/* ============================================================
+   ҮНЭЛГЭЭ
+   ============================================================ */
+function normalize(s) {
+  return String(s || "").trim().toLowerCase()
+    .replace(/[«»"'`]/g, "").replace(/\s+/g, " ");
+}
+function asNumber(s) {
+  const t = String(s || "").trim().replace(/\s/g, "").replace(",", ".").replace(/[^0-9.\-\/]/g, "");
+  if (t.includes("/")) {
+    const p = t.split("/");
+    if (p.length === 2 && parseFloat(p[1]) !== 0) return parseFloat(p[0]) / parseFloat(p[1]);
+  }
+  const v = parseFloat(t);
+  return isNaN(v) ? null : v;
+}
+
+function grade() {
+  const ans = { s1: [], s2: [], s3: [] };
+  let s1 = 0, s2 = 0, s3 = 0;
+
+  S1.forEach((it, i) => {
+    const el = document.querySelector(`input[name=a${i}]:checked`);
+    const v = el ? el.value : "";
+    ans.s1.push(v);
+    if ((v === "T") === it[1] && v !== "") s1 += PTS.s1;
+  });
+
+  S2.forEach((it, i) => {
+    const el = document.querySelector(`input[name=b${i}]:checked`);
+    const v = el ? +el.value : -1;
+    ans.s2.push(v);
+    if (v === it[2]) s2 += PTS.s2;
+  });
+
+  S3.forEach((it, i) => {
+    const el = document.querySelector(`[name=c${i}]`);
+    const raw = el ? el.value : "";
+    ans.s3.push(raw);
+    if (!raw.trim()) return;
+
+    if (it.t === "code") {
+      const hit = it.pats.filter(p => p.test(raw)).length;
+      s3 += PTS.s3 * (hit / it.pats.length);
+    } else if (it.num !== undefined) {
+      const v = asNumber(raw);
+      if (v !== null && Math.abs(v - it.num) < 1e-6) s3 += PTS.s3;
+    } else {
+      const n = normalize(raw);
+      if (it.accept.some(a => n === normalize(a) || n.includes(normalize(a)))) s3 += PTS.s3;
+    }
+  });
+
+  const r2 = x => Math.round(x * 100) / 100;
+  return { s1: r2(s1), s2: r2(s2), s3: r2(s3), total: r2(s1 + s2 + s3), answers: ans };
+}
+
+/* ============================================================
+   ЦОНХ СОЛИХЫГ ХЯНАХ
+   ============================================================ */
+function registerSwitch(reason) {
+  if (!examActive) return;
+  const now = Date.now();
+  if (now - lastSwitchAt < 1200) return;      // давхар тоолохоос сэргийлэх
+  lastSwitchAt = now;
+  switches++;
+
+  $("#pillSw").textContent = `Цонх солилт: ${switches} / ${MAX_SWITCH}`;
+  $("#pillSw").className = "pill " + (switches >= MAX_SWITCH ? "danger" : "warn");
+
+  if (!DEMO) api({ action: "event", token: TOKEN, type: "цонх солив",
+                   switches, ip: CLIENT_IP }).catch(() => {});
+
+  if (switches >= MAX_SWITCH) {
+    lockExam();
+  } else {
+    $("#wTitle").textContent = "⚠ Анхааруулга " + switches + " / " + MAX_SWITCH;
+    $("#wBody").innerHTML = `Та шалгалтын цонхноос гарсан нь бүртгэгдлээ.<br><br>
+      Үлдсэн боломж: <b>${MAX_SWITCH - switches}</b> удаа.
+      Дараа нь шалгалт автоматаар түгжигдэнэ.`;
+    $("#warnModal").classList.add("show");
+  }
+}
+$("#wOk").onclick = () => $("#warnModal").classList.remove("show");
+$("#lockOk").onclick = () => $("#lockModal").classList.remove("show");
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) registerSwitch("hidden");
+});
+window.addEventListener("blur", () => registerSwitch("blur"));
+
+/* ============================================================
+   ЭХЛЭХ / ДУУСГАХ
+   ============================================================ */
+function startExam() {
+  $("#gate").style.display = "none";
+  $("#exam").style.display = "";
+  $("#whoName").textContent = USER.name;
+  $("#avatar").textContent = (USER.name || "О").trim().charAt(0);
+  $("#pillSw").textContent = `Цонх солилт: ${switches} / ${MAX_SWITCH}`;
+
+  buildExam();
+  updateProgress();
+  startedAt = Date.now();
+  examActive = true;
+  window.scrollTo(0, 0);
+
+  window.addEventListener("beforeunload", beforeUnload);
+}
+
+function beforeUnload(e) {
+  if (examActive && !submitted) { e.preventDefault(); e.returnValue = ""; }
+}
+
+function lockExam() {
+  if (!examActive) return;
+  $("#lockModal").classList.add("show");
+  finish(true);
+}
+
+async function finish(locked) {
+  if (submitted) return;
+  submitted = true;
+  examActive = false;
+  window.removeEventListener("beforeunload", beforeUnload);
+
+  const g = grade();
+  const minutes = Math.round((Date.now() - startedAt) / 60000 * 10) / 10;
+
+  $("#exam").style.display = "none";
+  $("#done").style.display = "";
+  $("#finalScore").textContent = g.total.toFixed(2);
+  $("#breakdown").innerHTML = `
+    <div class="stat"><div class="k">Хэсэг 1</div><div class="v">${g.s1.toFixed(2)}</div></div>
+    <div class="stat"><div class="k">Хэсэг 2</div><div class="v">${g.s2.toFixed(2)}</div></div>
+    <div class="stat"><div class="k">Хэсэг 3</div><div class="v">${g.s3.toFixed(2)}</div></div>
+    <div class="stat"><div class="k">Цонх солилт</div><div class="v">${switches}</div></div>`;
+  window.scrollTo(0, 0);
+
+  if (DEMO) {
+    $("#doneNote").innerHTML = "<b>Туршилтын горим</b> — дүн серверт бүртгэгдээгүй.";
+    return;
+  }
+
+  $("#doneNote").textContent = "Дүнг илгээж байна…";
+  try {
+    const res = await api({
+      action: "submit", token: TOKEN, ip: CLIENT_IP,
+      s1: g.s1, s2: g.s2, s3: g.s3, total: g.total,
+      switches, locked: !!locked, minutes,
+      answers: JSON.stringify(g.answers)
+    });
+    $("#doneNote").innerHTML = res.ok
+      ? "✓ Дүн амжилттай бүртгэгдлээ." + (locked ? " (түгжигдсэн)" : "")
+      : "⚠ " + esc(res.error || "Бүртгэгдсэнгүй.");
+  } catch (e) {
+    $("#doneNote").innerHTML = "⚠ Серверт илгээж чадсангүй. Багшдаа мэдэгдэнэ үү.<br>" +
+      "<small>Оноо: " + g.total.toFixed(2) + " / 10</small>";
+  }
+}
+
+$("#submitBtn").onclick = function () {
+  const n = countAnswered();
+  const left = TOTAL_Q - n;
+  const ask = left > 0
+    ? `${left} асуулт хариулаагүй байна. Ийм байдлаар илгээх үү?`
+    : "Шалгалтаа илгээх үү? Илгээсний дараа засах боломжгүй.";
+  if (!confirm(ask)) return;
+  this.disabled = true;
+  finish(false);
+};
+
+/* ============================================================
+   БАГШИЙН САМБАР
+   ============================================================ */
+let lastRows = [];
+
+async function loadResults() {
+  try {
+    const res = await api({ action: "results", token: TOKEN });
+    if (!res.ok) { alert(res.error || "Алдаа"); return; }
+    lastRows = res.rows || [];
+
+    const done = lastRows.length;
+    const locked = lastRows.filter(r => String(r[9]) === "тийм").length;
+    const avg = done ? (lastRows.reduce((a, r) => a + (Number(r[7]) || 0), 0) / done) : 0;
+    $("#teaStats").innerHTML = `
+      <div class="stat"><div class="k">Нийт оюутан</div><div class="v">${res.total}</div></div>
+      <div class="stat"><div class="k">Өгсөн</div><div class="v">${done}</div></div>
+      <div class="stat"><div class="k">Дундаж оноо</div><div class="v">${avg.toFixed(2)}</div></div>
+      <div class="stat"><div class="k">Түгжигдсэн</div><div class="v">${locked}</div></div>`;
+
+    $("#resTable").innerHTML = done ? `<table><thead><tr>
+        <th>Цаг</th><th>Код</th><th>Нэр</th><th>IP</th><th>Х1</th><th>Х2</th><th>Х3</th>
+        <th>Нийт</th><th>Солилт</th><th>Төлөв</th><th>Мин</th><th></th></tr></thead><tbody>` +
+      lastRows.map(r => {
+        const lk = String(r[9]) === "тийм";
+        return `<tr>
+          <td>${esc(r[0])}</td><td><b>${esc(r[1])}</b></td><td>${esc(r[2])}</td>
+          <td>${esc(r[3]) || "—"}</td>
+          <td>${esc(r[4])}</td><td>${esc(r[5])}</td><td>${esc(r[6])}</td>
+          <td><b>${esc(r[7])}</b></td>
+          <td>${esc(r[8])}</td>
+          <td><span class="tag ${lk ? "lock" : "ok"}">${lk ? "түгжигдсэн" : "хэвийн"}</span></td>
+          <td>${esc(r[10])}</td>
+          <td><button class="btn ghost" data-sid="${esc(r[1])}">Дахин</button></td>
+        </tr>`;
+      }).join("") + "</tbody></table>"
+      : '<div class="sub" style="padding:18px 0;text-align:center">Одоогоор дүн алга.</div>';
+
+    $("#resTable").querySelectorAll("button[data-sid]").forEach(b => b.onclick = async () => {
+      if (!confirm(b.dataset.sid + " — дүнг цуцалж, дахин өгөх эрх олгох уу?")) return;
+      const r = await api({ action: "unlock", token: TOKEN, sid: b.dataset.sid });
+      if (!r.ok) alert(r.error || "Алдаа"); else loadResults();
+    });
+
+    const logs = res.logs || [];
+    $("#logTable").innerHTML = logs.length ? `<table><thead><tr>
+        <th>Цаг</th><th>Код</th><th>Нэр</th><th>IP</th><th>Үйл явдал</th><th>Тайлбар</th>
+      </tr></thead><tbody>` + logs.map(l => `<tr>
+        <td>${esc(l[0])}</td><td>${esc(l[1])}</td><td>${esc(l[2])}</td>
+        <td>${esc(l[3]) || "—"}</td><td>${esc(l[4])}</td><td>${esc(l[5])}</td></tr>`).join("") +
+      "</tbody></table>"
+      : '<div class="sub" style="padding:18px 0;text-align:center">Лог хоосон.</div>';
+
+  } catch (e) {
+    alert("Серверт холбогдож чадсангүй: " + e.message);
+  }
+}
+
+$("#refreshBtn").onclick = loadResults;
+$("#outBtn").onclick = () => location.reload();
+$("#csvBtn").onclick = () => {
+  if (!lastRows.length) { alert("Татах дүн алга."); return; }
+  const head = ["Цаг","Код","Нэр","IP","Хэсэг 1","Хэсэг 2","Хэсэг 3","Нийт (10)","Цонх солилт","Түгжсэн","Минут"];
+  const lines = [head.join(",")].concat(lastRows.map(r =>
+    r.map(v => `"${String(v == null ? "" : v).replace(/"/g, '""')}"`).join(",")));
+  const blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a"), d = new Date();
+  a.href = URL.createObjectURL(blob);
+  a.download = `shalgalt_ETC320_${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+};
+
+/* ============================================================
+   Эхлэл
+   ============================================================ */
+if (DEMO) {
+  $("#demoBanner").innerHTML =
+    '<div class="demo">⚠ ТУРШИЛТЫН ГОРИМ — сервер тохируулаагүй тул дүн бүртгэгдэхгүй. ' +
+    'Ажиллуулахын тулд кодын дотор API_URL-ээ тавина уу (SETUP.md).</div>';
+}
+loadRoster();
+</script>
+</body>
+</html>
